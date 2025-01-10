@@ -3,6 +3,8 @@ from model import SimpleTransformer
 import numpy as np
 import PyPDF2
 import re
+import pickle
+import os
 
 def read_pdf(pdf_path):
     """Extract text from a PDF file."""
@@ -36,8 +38,13 @@ def create_training_data(sequences, seq_length=50):
     return x, y
 
 def main():
-    # Read PDF file (replace with your PDF path)
-    pdf_path = "path/to/your/book.pdf"
+    # Create a directory for saving models if it doesn't exist
+    save_dir = "saved_model"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Read PDF file
+    pdf_path = "mobydickpdf.pdf"
     try:
         text = read_pdf(pdf_path)
         print(f"Successfully loaded PDF. Text length: {len(text)} characters")
@@ -46,7 +53,7 @@ def main():
         return
     
     # Model parameters
-    vocab_size = 5000  # Increased for better vocabulary coverage
+    vocab_size = 5000
     seq_length = 50
     d_model = 64
     num_heads = 2
@@ -68,14 +75,42 @@ def main():
         metrics=['accuracy']
     )
     
+    # Add ModelCheckpoint callback to save the best model during training
+    checkpoint_path = os.path.join(save_dir, "model_checkpoint")
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path,
+        save_weights_only=False,
+        save_best_only=True,
+        monitor='val_loss',
+        verbose=1
+    )
+    
     # Train model
-    model.fit(
+    history = model.fit(
         x_train, 
         y_train, 
         epochs=10, 
         batch_size=32,
-        validation_split=0.1
+        validation_split=0.1,
+        callbacks=[checkpoint_callback]
     )
+
+    # Save the final model
+    final_model_path = os.path.join(save_dir, "final_model")
+    model.save(final_model_path)
+    print(f"Model saved to {final_model_path}")
+
+    # Save the tokenizer
+    tokenizer_path = os.path.join(save_dir, "tokenizer.pickle")
+    with open(tokenizer_path, 'wb') as handle:
+        pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print(f"Tokenizer saved to {tokenizer_path}")
+
+    # Save training history
+    history_path = os.path.join(save_dir, "training_history.pickle")
+    with open(history_path, 'wb') as handle:
+        pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print(f"Training history saved to {history_path}")
 
 if __name__ == "__main__":
     main()
