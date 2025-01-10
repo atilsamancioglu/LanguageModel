@@ -6,7 +6,7 @@ def load_model_and_tokenizer():
     save_dir = "saved_model"
     
     # Load the model
-    model_path = os.path.join(save_dir, "final_model")
+    model_path = os.path.join(save_dir, "final_model.keras")
     model = tf.keras.models.load_model(model_path)
     
     # Load the tokenizer

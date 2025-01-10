@@ -76,7 +76,7 @@ def main():
     )
     
     # Add ModelCheckpoint callback to save the best model during training
-    checkpoint_path = os.path.join(save_dir, "model_checkpoint")
+    checkpoint_path = os.path.join(save_dir, "model_checkpoint.keras")
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path,
         save_weights_only=False,
@@ -96,7 +96,7 @@ def main():
     )
 
     # Save the final model
-    final_model_path = os.path.join(save_dir, "final_model")
+    final_model_path = os.path.join(save_dir, "final_model.keras")
     model.save(final_model_path)
     print(f"Model saved to {final_model_path}")
 

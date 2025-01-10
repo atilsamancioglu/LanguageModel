@@ -2,10 +2,14 @@ import tensorflow as tf
 import numpy as np
 
 class SimpleTransformer(tf.keras.Model):
-    def __init__(self, vocab_size, d_model=64, num_heads=2, num_layers=2):
-        super().__init__()
+    def __init__(self, vocab_size, d_model=64, num_heads=2, num_layers=2, **kwargs):
+        super().__init__(**kwargs)
         
+        self.vocab_size = vocab_size
         self.d_model = d_model
+        self.num_heads = num_heads
+        self.num_layers = num_layers
+        
         self.embedding = tf.keras.layers.Embedding(vocab_size, d_model)
         self.pos_encoding = self.positional_encoding(vocab_size, d_model)
         
@@ -15,6 +19,20 @@ class SimpleTransformer(tf.keras.Model):
         ]
         
         self.final_layer = tf.keras.layers.Dense(vocab_size)
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            "vocab_size": self.vocab_size,
+            "d_model": self.d_model,
+            "num_heads": self.num_heads,
+            "num_layers": self.num_layers,
+        })
+        return config
+    
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
     
     def positional_encoding(self, position, d_model):
         angles = np.arange(position)[:, np.newaxis] / np.power(
@@ -43,8 +61,11 @@ class SimpleTransformer(tf.keras.Model):
         return self.final_layer(x)
 
 class TransformerBlock(tf.keras.layers.Layer):
-    def __init__(self, d_model, num_heads):
-        super().__init__()
+    def __init__(self, d_model, num_heads, **kwargs):
+        super().__init__(**kwargs)
+        self.d_model = d_model
+        self.num_heads = num_heads
+        
         self.attention = tf.keras.layers.MultiHeadAttention(
             num_heads=num_heads, key_dim=d_model
         )
@@ -55,6 +76,18 @@ class TransformerBlock(tf.keras.layers.Layer):
         
         self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
         self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
+    
+    def get_config(self):
+        config = super().get_config()
+        config.update({
+            "d_model": self.d_model,
+            "num_heads": self.num_heads,
+        })
+        return config
+    
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
         
     def call(self, x):
         # Self-attention
