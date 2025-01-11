@@ -25,16 +25,16 @@ This project creates a simple language model that can learn from text and genera
 
 1. Clone the repository:
 
-bash
+```bash
 git clone [repository-url]
 cd language-model
-
+```
 
 2. Install required packages:
 
-bash
+```bash
 pip install -r requirements.txt
-
+```
 
 Required dependencies:
 - tensorflow==2.16.1
@@ -42,12 +42,14 @@ Required dependencies:
 - PyPDF2>=3.0.0
 
 ## Project Structure
+```
 project/
 ├── main.py # Training script
 ├── model.py # Model architecture
 ├── predict.py # Text generation
 ├── documentation.md # This documentation
 └── requirements.txt # Dependencies
+```
 
 ## How It Works
 
@@ -89,9 +91,10 @@ Think of the process like teaching someone a new language:
 
 #### PDF Reader Function
 
-python
+```python
 def read_pdf(pdf_path):
-"""Extract text from a PDF file."""
+    """Extract text from a PDF file."""
+```
 
 This function:
 - Opens your PDF document
@@ -125,20 +128,22 @@ Processed: [4, 7, 12] # Numbers representing words in vocabulary
 The heart of our language model is the Transformer architecture, which consists of several key components:
 
 ##### Embedding Layer
-python
+```python
 self.embedding = tf.keras.layers.Embedding(vocab_size, d_model)
 - Converts word indices into rich vector representations
 - Each word gets a unique numerical representation
 - Example: "whale" → [0.2, -0.5, 0.7, ...] (vector of numbers)
 - Helps model understand word relationships
+```
 
 ##### Positional Encoding
-python
+```python
 self.pos_encoding = self.positional_encoding(vocab_size, d_model)
 - Adds information about word position in sequence
 - Helps model understand word order
 - Uses mathematical functions (sine and cosine) to encode positions
 - Essential for understanding sentence structure
+```
 
 ##### Transformer Blocks
 Each transformer block contains:
@@ -159,7 +164,7 @@ Each transformer block contains:
 ### 3. Training Process
 
 #### Data Preparation
-python
+```python
 def create_training_data(sequences, seq_length=50):
 What it does:
 - Creates sliding windows of text
@@ -171,16 +176,18 @@ Example:
 Text: "the white whale swam in the ocean"
 Input: "the white whale swam"
 Target: "white whale swam in"
+```
 
 #### Training Configuration
 Current settings:
-python
+```python
 vocab_size = 10000 # Maximum number of unique words
 d_model = 128 # Dimension of word embeddings
 num_heads = 4 # Number of attention heads
 num_layers = 3 # Number of transformer blocks
 batch_size = 32 # Samples processed at once
 epochs = 10 # Complete passes through data
+```
 
 #### Model Training
 The training process:
@@ -204,7 +211,7 @@ The training process:
 
 #### Generation Function
 
-python
+```python
 def generate_text(model, tokenizer, seed_text, num_words=50, temperature=0.7):
 
 
@@ -227,6 +234,7 @@ This function handles the text generation process:
    - Samples next word from distribution
    - Adds word to generated sequence
    - Repeats until desired length
+```
 
 ## Usage Guide
 
