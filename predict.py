@@ -18,6 +18,31 @@ def load_model_and_tokenizer():
     return model, tokenizer
 
 def generate_text(model, tokenizer, seed_text, num_words=50, temperature=0.7):
+    """
+    Generates new text based on a seed phrase.
+    
+    How it works:
+    1. Takes a starting phrase (seed text)
+    2. For each new word to generate:
+       - Converts current text to numbers using tokenizer
+       - Feeds numbers into model to get predictions
+       - Applies temperature to control randomness:
+         * Low temperature (0.2-0.3): More focused, repetitive text
+         * High temperature (0.7-1.0): More creative, diverse text
+       - Randomly selects next word based on predictions
+       - Adds new word to generated text
+       - Repeats until desired length
+    
+    Args:
+        model: Trained language model
+        tokenizer: Tokenizer object for converting words to/from numbers
+        seed_text (str): Starting phrase for generation
+        num_words (int): Number of words to generate
+        temperature (float): Controls randomness (0.2-1.0)
+        
+    Returns:
+        str: Generated text including seed text
+    """
     # Convert seed text to lowercase to match training data
     seed_text = seed_text.lower()
     
@@ -25,7 +50,7 @@ def generate_text(model, tokenizer, seed_text, num_words=50, temperature=0.7):
     current_sequence = tokenizer.texts_to_sequences([seed_text])[0]
     generated_text = seed_text
     
-    # Create reverse word index
+    # Create reverse word index for converting numbers back to words
     reverse_word_index = {v: k for k, v in tokenizer.word_index.items()}
     
     for _ in range(num_words):
@@ -37,13 +62,13 @@ def generate_text(model, tokenizer, seed_text, num_words=50, temperature=0.7):
         # Convert to numpy array and reshape for model input
         padded_sequence = np.array(padded_sequence)[np.newaxis, :]
             
-        # Predict next word
+        # Get model's predictions for next word
         predictions = model.predict(padded_sequence, verbose=0)[0]
         
         # Get the last prediction (for the next word)
         next_word_logits = predictions[-1]
         
-        # Apply temperature scaling and softmax
+        # Apply temperature scaling to control randomness
         scaled_logits = next_word_logits / temperature
         # Subtract max for numerical stability
         scaled_logits = scaled_logits - np.max(scaled_logits)
@@ -55,14 +80,14 @@ def generate_text(model, tokenizer, seed_text, num_words=50, temperature=0.7):
         probabilities = probabilities / np.sum(probabilities)
         
         try:
-            # Sample from the distribution
+            # Sample from the distribution to get next word
             predicted_id = np.random.choice(len(probabilities), p=probabilities)
             
             # Skip if predicted token is OOV or padding
             if predicted_id == 0 or predicted_id == tokenizer.word_index.get('<OOV>', 0):
                 continue
                 
-            # Get the word
+            # Convert number back to word and add to generated text
             predicted_word = reverse_word_index.get(predicted_id, '')
             if predicted_word:
                 generated_text += ' ' + predicted_word

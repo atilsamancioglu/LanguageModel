@@ -2,6 +2,31 @@ import tensorflow as tf
 import numpy as np
 
 class SimpleTransformer(tf.keras.Model):
+    """
+    A simplified version of the Transformer architecture for language modeling.
+    
+    How it works:
+    1. Takes sequences of word numbers as input
+    2. Converts numbers to rich word representations (embeddings)
+    3. Adds position information to maintain word order
+    4. Processes through multiple transformer blocks that:
+       - Use attention to focus on relevant words
+       - Learn relationships between words
+       - Transform word representations
+    5. Outputs predictions for the next word
+    
+    Components:
+    - Embedding layer: Converts word numbers to vectors
+    - Positional encoding: Adds position information
+    - Transformer blocks: Process and transform word representations
+    - Final layer: Converts to word probabilities
+    
+    Args:
+        vocab_size (int): Size of vocabulary
+        d_model (int): Size of word vectors
+        num_heads (int): Number of attention heads
+        num_layers (int): Number of transformer blocks
+    """
     def __init__(self, vocab_size, d_model=64, num_heads=2, num_layers=2, **kwargs):
         super().__init__(**kwargs)
         
@@ -61,6 +86,29 @@ class SimpleTransformer(tf.keras.Model):
         return self.final_layer(x)
 
 class TransformerBlock(tf.keras.layers.Layer):
+    """
+    Core processing block of the Transformer model.
+    
+    How it works:
+    1. Multi-Head Attention:
+       - Allows model to focus on different parts of input
+       - Like having multiple "perspectives" on the text
+       - Example: One head might focus on subject-verb agreement,
+         another on topic-related words
+    
+    2. Feed-Forward Network:
+       - Processes attended information
+       - Transforms word representations
+       - Learns complex patterns
+    
+    3. Layer Normalization:
+       - Stabilizes learning
+       - Helps training converge better
+    
+    Args:
+        d_model (int): Size of word vectors
+        num_heads (int): Number of attention heads
+    """
     def __init__(self, d_model, num_heads, **kwargs):
         super().__init__(**kwargs)
         self.d_model = d_model

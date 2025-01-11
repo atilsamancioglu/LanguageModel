@@ -7,7 +7,24 @@ import pickle
 import os
 
 def read_pdf(pdf_path):
-    """Extract text from a PDF file."""
+    """
+    Extracts and processes text from a PDF file.
+    
+    How it works:
+    1. Opens a PDF file using PyPDF2 library
+    2. Reads through each page of the PDF
+    3. Extracts raw text content
+    4. Cleans the text by:
+       - Removing extra whitespace
+       - Removing special characters
+       - Standardizing spacing
+    
+    Args:
+        pdf_path (str): Path to the PDF file to read
+        
+    Returns:
+        str: Cleaned text content from the PDF
+    """
     text = ""
     with open(pdf_path, 'rb') as file:
         pdf_reader = PyPDF2.PdfReader(file)
@@ -21,6 +38,27 @@ def read_pdf(pdf_path):
 
 # Sample text preprocessing
 def preprocess_text(text, vocab_size=1000):
+    """
+    Converts raw text into a format suitable for the language model.
+    
+    How it works:
+    1. Creates a tokenizer that will:
+       - Convert words to numbers (e.g., "whale" -> 42)
+       - Handle unknown words with <OOV> (Out Of Vocabulary) token
+       - Limit vocabulary to most common words
+    2. Processes the text by:
+       - Converting to lowercase
+       - Splitting into individual words
+       - Creating a dictionary of word->number mappings
+       - Converting the text into sequences of numbers
+    
+    Args:
+        text (str): Raw text to process
+        vocab_size (int): Maximum number of unique words to keep
+        
+    Returns:
+        tuple: (sequences of numbers, tokenizer object)
+    """
     # Add special tokens
     tokenizer = tf.keras.preprocessing.text.Tokenizer(
         num_words=vocab_size,
@@ -36,6 +74,29 @@ def preprocess_text(text, vocab_size=1000):
     return sequences, tokenizer
 
 def create_training_data(sequences, seq_length=50):
+    """
+    Creates input-output pairs for training the language model.
+    
+    How it works:
+    1. Takes a sequence of numbers (representing words)
+    2. Creates sliding windows of text, where:
+       - Input: Words 1-50
+       - Target: Words 2-51
+       This teaches the model to predict the next word
+    
+    Example:
+    Text: "the cat sat on mat"
+    Becomes:
+    Input: "the cat sat on"
+    Target: "cat sat on mat"
+    
+    Args:
+        sequences (list): List of numbers representing words
+        seq_length (int): Length of each training sequence
+        
+    Returns:
+        tuple: (input sequences, target sequences) as numpy arrays
+    """
     input_sequences = []
     for i in range(len(sequences) - seq_length):
         input_sequences.append(sequences[i:i + seq_length + 1])
