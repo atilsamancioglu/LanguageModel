@@ -26,7 +26,7 @@ This project creates a simple language model that can learn from text and genera
 1. Clone the repository:
 
 ```bash
-git clone [repository-url]
+git clone https://github.com/atilsamancioglu/LanguageModel.git
 cd language-model
 ```
 
@@ -430,9 +430,3 @@ def interactive_generation():
    - Add generation constraints
 
 ---
-
-*Last Updated: [Current Date]*
-*Created by: [Your Name/Organization]*
-
-For questions or issues, please open an issue in the repository.
-
