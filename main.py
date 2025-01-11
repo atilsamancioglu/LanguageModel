@@ -21,11 +21,18 @@ def read_pdf(pdf_path):
 
 # Sample text preprocessing
 def preprocess_text(text, vocab_size=1000):
+    # Add special tokens
     tokenizer = tf.keras.preprocessing.text.Tokenizer(
-        num_words=vocab_size, oov_token="<OOV>"
+        num_words=vocab_size,
+        oov_token="<OOV>",
+        filters='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
     )
-    tokenizer.fit_on_texts([text])
-    sequences = tokenizer.texts_to_sequences([text])[0]
+    # Split text into words
+    words = text.lower().split()
+    # Fit tokenizer on words
+    tokenizer.fit_on_texts([' '.join(words)])
+    # Convert to sequences
+    sequences = tokenizer.texts_to_sequences([' '.join(words)])[0]
     return sequences, tokenizer
 
 def create_training_data(sequences, seq_length=50):
@@ -53,11 +60,11 @@ def main():
         return
     
     # Model parameters
-    vocab_size = 5000
+    vocab_size = 10000  # Increased vocabulary size
     seq_length = 50
-    d_model = 64
-    num_heads = 2
-    num_layers = 2
+    d_model = 128      # Increased model dimension
+    num_heads = 4      # Increased number of attention heads
+    num_layers = 3     # Increased number of transformer layers
     
     # Preprocess data
     sequences, tokenizer = preprocess_text(text, vocab_size)
