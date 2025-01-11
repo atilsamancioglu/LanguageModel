@@ -47,7 +47,7 @@ project/
 ├── main.py # Training script
 ├── model.py # Model architecture
 ├── predict.py # Text generation
-├── documentation.md # This documentation
+├── README.md # This documentation
 └── requirements.txt # Dependencies
 ```
 
