@@ -27,7 +27,7 @@ This project creates a simple language model that can learn from text and genera
 
 ```bash
 git clone https://github.com/atilsamancioglu/LanguageModel.git
-cd language-model
+cd LanguageModel
 ```
 
 2. Install required packages:
